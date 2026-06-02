@@ -96,6 +96,53 @@ const db = firebase.database();
 const refReservas =
 db.ref("reservas_vip");
 
+    
+    // FUNÇÃO QUE BUSCA OS DADOS NO INDEX.HTML
+
+    async function puxarDadosDoIndex() {
+
+        try {
+
+            const resposta = await fetch('./index.html');
+
+            if (!resposta.ok) throw new Error();
+
+            
+
+            const htmlTexto = await resposta.text();
+
+            const parser = new DOMParser();
+
+            const docIndex = parser.parseFromString(htmlTexto, 'text/html');
+
+            
+
+            const nomeNoIndex = docIndex.getElementById('evento-nome');
+
+            const dataNoIndex = docIndex.getElementById('evento-data');
+
+            
+
+            if (nomeNoIndex) document.getElementById('evento-nome').innerText = nomeNoIndex.innerText.trim().toUpperCase();
+
+            if (dataNoIndex) document.getElementById('evento-data').innerText = dataNoIndex.innerText.trim().toUpperCase();
+
+            
+
+        } catch (error) {
+
+            document.getElementById('evento-nome').innerText = "BANDA FÊNIX";
+
+            document.getElementById('evento-data').innerText = "06/06/2026 - 21H";
+
+        }
+
+    }
+
+
+
+    puxarDadosDoIndex();
+
 </script>
 
 <script src="validacao.js"></script>
