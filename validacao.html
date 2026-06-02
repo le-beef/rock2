@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Validação Le Beef</title>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<link rel="stylesheet" href="validacao.css">
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🍷 LE BEEF</h1>
+    <h2>VALIDAÇÃO INGRESSO</h2>
+
+    <!-- VALIDAR QR/CÓDIGO -->
+  <button id="btn-camera" style="background: #333; color: #d4af37; margin-bottom: 15px;">
+        📷 ABRIR CÂMERA
+    </button>
+    
+    <div id="leitor" style="width: 100%; margin-bottom: 20px; display: none; border-radius: 12px; overflow: hidden;"></div>
+
+    <input
+        type="text"
+        id="codigo"
+        placeholder="Digite ou escaneie o código"
+    >
+
+    <button id="btn-validar">
+        VALIDAR ENTRADA
+    </button>
+
+    <hr>
+
+    <!-- PESQUISA -->
+    <h3>🔎 Buscar Reserva</h3>
+
+    <input
+        type="text"
+        id="pesquisa"
+        placeholder="Mesa ou nome do responsável"
+    >
+
+    <div class="acoes-busca">
+
+    <button id="btn-pesquisar">
+        🔎 PESQUISAR
+    </button>
+
+    <button id="btn-listar">
+        📋 LISTAR TODAS
+    </button>
+
+</div>
+
+    <div id="resultado"></div>
+    <div id="totais-gerais"></div>
+
+</div>
+
+<script>
+
+// Cole o objeto firebaseConfig que você copiou do Firebase Console
+        const firebaseConfig = {
+  apiKey: "AIzaSyBZhLxRS-EV97Tm3ct_y1UnOaJ8y8RcXgI",
+  authDomain: "rock2-7ff1b.firebaseapp.com",
+  databaseURL: "https://rock2-7ff1b-default-rtdb.firebaseio.com",
+  projectId: "rock2-7ff1b",
+  storageBucket: "rock2-7ff1b.firebasestorage.app",
+  messagingSenderId: "434104566373",
+  appId: "1:434104566373:web:72441179d3b636a1817c8c"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.database();
+
+const refReservas =
+db.ref("reservas_vip");
+
+</script>
+
+<script src="validacao.js"></script>
+
+</body>
+</html>

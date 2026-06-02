@@ -1,0 +1,388 @@
+/* Estilos Gerais */
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f4f4f4;
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 10px;
+}
+h2 {
+    /* Define o fundo amarelo (#FFFF00) para realçar o texto */
+    background-color: #FFFF00; 
+    
+    /* Faz com que o elemento se ajuste apenas à largura do texto */
+    display: inline-block; 
+    
+    /* Adiciona um pequeno espaço interno (padding) ao redor do texto */
+    padding: 5px 10px; 
+    
+    /* Centraliza o bloco h2 na tela, caso o elemento pai esteja centralizado */
+    margin: 20px auto;
+}
+
+/* 🗺️ Estilos do Mapa */
+.mapa-container {
+    /* AJUSTE ESTES VALORES para a largura e altura reais da sua imagem */
+    width: 563px; 
+    height: 1000px;
+    margin: 0 auto;
+    /* 🖼️ CERTIFIQUE-SE QUE SUA IMAGEM CHAMA new.png */
+    background-image: url('new.png'); 
+    background-size: contain;
+    background-repeat: no-repeat;
+    position: relative; 
+    border: 1px solid #ccc;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+/* Estilos para a Lista de Mesas Ocupadas */
+.lista-ocupacao-container {
+    max-width: 523px;
+    margin: 0px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 0px;
+    background-color: #fff;
+    text-align: left;
+}
+
+#lista-mesas-ocupadas {
+    list-style: none;
+    padding: 0;
+}
+
+#lista-mesas-ocupadas li {
+    padding: 10px 0;
+    border-bottom: 2px dotted #818181;
+    font-size: 14px;
+}
+
+#lista-mesas-ocupadas li:last-child {
+    border-bottom: none;
+}
+
+/* 🖱️ Estilos das Mesas Clicáveis */
+.mesa {
+    /* Tamanho da área clicável */
+    width: 30px; 
+    height: 30px; 
+    background-color: rgba(255, 255, 255, 0); 
+    position: absolute; 
+    border: 0px solid #333;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    line-height: 35px;
+    font-weight: bold;
+    color: #333;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+
+/* 📌 POSICIONAMENTO DAS MESAS - VOCÊ DEVE AJUSTAR ESTES VALORES */
+/* style.css - CÓDIGO DE POSICIONAMENTO PARA MESAS 01 a 39 */
+
+/* LINHA 1 */
+#mesa-01 { top: 321px; left: 307px; }
+#mesa-02 { top: 321px; left: 260px; }
+#mesa-03 { top: 321px; left: 212px; }
+#mesa-04 { top: 321px; left: 165px; }
+#mesa-05 { top: 278px; left: 165px; }
+#mesa-06 { top: 278px; left: 212px; }
+#mesa-07 { top: 278px; left: 260px; }
+#mesa-08 { top: 278px; left: 307px; }
+#mesa-09 { top: 235px; left: 307px; }
+
+/* LINHA 2 */
+#mesa-10 { top: 235px; left: 260px; }
+#mesa-11 { top: 235px; left: 212px; }
+#mesa-12 { top: 192px; left: 212px; }
+#mesa-13 { top: 192px; left: 260px; }
+#mesa-14 { top: 192px; left: 307px; }
+#mesa-15 { top: 150px; left: 307px; }
+#mesa-16 { top: 150px; left: 260px; }
+#mesa-17 { top: 150px; left: 212px; }
+#mesa-18 { top: 106px; left: 307px; }
+#mesa-19 { top: 106px; left: 260px; }
+
+/* LINHA 3 */
+#mesa-20 { top: 106px; left: 212px; }
+#mesa-21 { top: 106px; left: 165px; }
+#mesa-22 { top: 106px; left: 113px; }
+#mesa-23 { top: 106px; left: 63px; }
+#mesa-24 { top: 63px; left: 212px; }
+#mesa-25 { top: 63px; left: 260px; }
+#mesa-26 { top: 63px; left: 307px; }
+
+
+/* LINHA 4 (MEZANINO) */
+#mesa-31 { top: 881px; left: 172px; }
+#mesa-32 { top: 881px; left: 221px; }
+#mesa-33 { top: 881px; left: 271px; }
+#mesa-34 { top: 838px; left: 296px; }
+#mesa-35 { top: 783px; left: 296px; }
+#mesa-36 { top: 728px; left: 296px; }
+#mesa-37 { top: 674px; left: 296px; }
+#mesa-38 { top: 618px; left: 296px; }
+#mesa-39 { top: 562px; left: 296px; }
+/* 📌 FIM DO POSICIONAMENTO */
+
+
+/* Estado da Mesa Ocupada */
+.mesa.ocupada {
+    background-color: rgba(255, 0, 0, 0.7); /* Fundo vermelho quando ocupada */
+    border-color: red;
+    color: white;
+}
+
+.mesa:hover {
+    box-shadow: 0 0 5px orange;
+}
+
+.mesa .numero {
+    display: inline-block; 
+}
+
+.mesa .x-status {
+    display: none; 
+    font-size: 20px;
+    color: white;
+}
+
+/* --- AJUSTE: MANTÉM O NÚMERO E ESCONDE O X --- */
+
+.mesa.ocupada .numero {
+    display: inline-block; /* Mantém o número visível mesmo ocupada */
+}
+
+.mesa.ocupada .x-status {
+    display: none; /* Esconde o 'X' permanentemente quando ocupada */
+}
+
+/* 📝 Estilos do Modal Modernizado e Compacto */
+.modal-overlay {
+    display: none; 
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.75);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 25px;
+    border-radius: 12px;
+    width: 380px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header h2 {
+    background-color: #FFFF00; /* Mantendo seu destaque amarelo */
+    margin-bottom: 15px;
+    font-size: 1.2em;
+    padding: 5px 10px;
+    display: inline-block;
+}
+
+/* Organização em Linhas */
+.form-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.form-group { flex: 1; text-align: left; }
+.full-width { flex: 0 0 100%; }
+
+.modal-content label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.modal-content input, .modal-content select, .modal-content textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+/* Botões em linha */
+.botoes-modal {
+    display: flex;
+    gap: 5px;
+    margin-top: 15px;
+}
+
+.botoes-modal button {
+    flex: 1;
+    padding: 10px 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.btn-ocupar { background-color: #27ae60; color: white; }
+.btn-liberar { background-color: #e74c3c; color: white; }
+.btn-fechar { background-color: #95a5a6; color: white; }
+
+#btn-emitir-vale{
+    background: linear-gradient(135deg,#000,#1b1b1b);
+    color: #d4af37;
+    border: 2px solid #d4af37;
+    font-weight: bold;
+}
+
+#btn-emitir-vale:hover{
+    transform: scale(1.03);
+    transition: .2s;
+}
+
+/* Estilo do botão de exportação */
+#btn-exportar {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+/* Estilo para o botão de Reset */
+.btn-perigo {
+    background-color: #dc3545; 
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    
+}
+
+.btn-perigo:hover {
+    background-color: #c82333;
+}
+
+#btn-exportar:hover {
+    background-color: #0056b3;
+}
+
+.botoes-rodape {
+    text-align: center;
+    margin-top: 10px; /* Adiciona bom espaçamento acima do botão */
+    margin-bottom: 0px; /* Adiciona espaçamento abaixo do botão */
+}
+
+/* --- Estilos do Rodapé SIMPLIFICADO (APENAS VERSÃO) --- */
+.rodape-versao {
+    margin-top: 50px;
+    padding: 15px 20px;
+    border-top: 1px solid #ccc;
+    background-color: #f0f0f0;
+    text-align: center; /* Centraliza o conteúdo (o div info-versao) */
+    font-size: 12px;
+    color: #666;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Centraliza o texto, já que não temos logo para forçar o alinhamento à direita */
+.info-versao {
+    text-align: center;
+    padding: 0; 
+}
+
+
+/* --- Media Query para Dispositivos Móveis (Solução: Manter PX) --- */
+@media (max-width: 600px) {
+    
+    /* APLICA ESCALA DE REDUÇÃO NO CONTAINER DO MAPA.
+    (0.66 é um palpite. Você pode precisar ajustar!)
+    */
+    .mapa-container {
+        transform: scale(0.70);
+        transform-origin: top center; 
+        
+        /* ⚠️ AJUSTE MANUAL: Isso puxa o mapa para a esquerda para centralizar após a escala. */
+        margin-left: -97px; /* **TESTE E AJUSTE ESTE VALOR** (Ex: -30px, -70px) no seu celular */
+    }
+    
+    /* Faz a lista de ocupação se ajustar à largura da tela */
+    .lista-ocupacao-container {
+        width: 90% auto;
+        max-width: 90% auto;
+	margin-top: -300px;
+        margin-left: -3px auto;
+    }
+
+/* ✅ CORREÇÃO FINAL: Remove a margem superior do rodapé APENAS NO CELULAR */
+    .rodape-versao {
+        margin-top: 5px; 
+    }
+
+    /* Reduz o tamanho da fonte do cabeçalho */
+    h1, h2 {
+        font-size: 1.4em;
+    }
+}
+
+/* botao de links */
+
+.atalhos {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin: 15px 0;
+    flex-wrap: wrap;
+}
+
+/* botão base */
+.btn-atalho {
+    text-decoration: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-weight: bold;
+    font-family: Arial, sans-serif;
+    color: white;
+    transition: 0.25s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    letter-spacing: 0.5px;
+}
+
+/* botão ingresso */
+.btn-atalho.ingresso {
+    background: linear-gradient(135deg, #ff7a18, #af002d);
+}
+
+/* botão validação */
+.btn-atalho.validacao {
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
+}
+
+/* efeito hover */
+.btn-atalho:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.3);
+    filter: brightness(1.1);
+}
+
+/* efeito clique */
+.btn-atalho:active {
+    transform: scale(0.97);
+}
+
+

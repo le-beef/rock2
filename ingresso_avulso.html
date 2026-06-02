@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Venda de Ingressos Avulsos - Le Beef</title>
+
+    <link rel="stylesheet" href="validacao.css">
+
+    
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+</head>
+
+<body>
+
+<div id="login-box" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#000;display:flex;justify-content:center;align-items:center;z-index:9999;">
+    
+    <div style="background:#111;padding:30px;border-radius:10px;text-align:center;border:1px solid #d4af37;">
+        <h2 style="color:#d4af37;">Acesso Restrito</h2>
+
+        <input type="password" id="senha" placeholder="Digite a senha" style="padding:10px;width:100%;margin-top:10px;">
+
+        <button onclick="verificarSenha()" style="margin-top:15px;width:100%;">
+            Entrar
+        </button>
+
+        <p id="erro" style="color:red;margin-top:10px;"></p>
+    </div>
+
+</div>
+
+
+
+<div class="container">
+
+    <h1>🍷 LE BEEF</h1>
+
+    
+
+    <!-- EXIBIÇÃO DO EVENTO NA TELA -->
+
+    <h2 id="evento-info">
+
+        <span id="evento-nome">CARREGANDO...</span>
+
+        <br>
+
+        <span id="evento-data">...</span>
+
+    </h2>
+
+<button id="btn-exportar-excel" style="margin:10px 0; background:#28a745;">
+    📊 Exportar Excel
+</button>
+
+    <!-- FORMULÁRIO DE VENDA -->
+
+    <div style="border: 1px solid #d4af37; padding: 25px; border-radius: 15px; background: #111; text-align: left;">
+
+        
+
+        <label style="display:block; margin-bottom: 8px; font-weight: bold; color: #d4af37;">Nome do Cliente:</label>
+
+        <input type="text" id="nome-cliente" placeholder="Ex: João Silva" required>
+
+
+
+        <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+
+            <div style="flex: 1;">
+
+                <label style="display:block; margin-bottom: 8px; font-weight: bold; color: #d4af37;">Quantidade:</label>
+
+                <input type="number" id="qtd-ingressos" value="1" min="1" max="20" required>
+
+            </div>
+
+            <div style="flex: 1;">
+
+                <label style="display:block; margin-bottom: 8px; font-weight: bold; color: #d4af37;">Valor Convite (R$):</label>
+
+                <input type="number" id="valor-unitario" placeholder="Ex: 40.00" step="0.01" required>
+
+            </div>
+
+        </div>
+
+
+
+        <div style="margin-bottom: 15px;">
+
+            <label style="display:block; margin-bottom: 8px; font-weight: bold; color: #d4af37;">Forma de Recebimento:</label>
+
+            <select id="forma-pagamento" style="width: 100%; padding: 10px; background: #222; color: white; border: 1px solid #333; border-radius: 8px; font-size: 1rem;">
+
+                <option value="Não Informado">​🚫 Não Informado</option>
+
+		<option value="Pix">📱 Pix</option>
+
+                <option value="Cartão">💳 Cartão</option>
+
+                <option value="Dinheiro">💵 Dinheiro</option>
+
+            </select>
+
+        </div>
+
+
+
+        <!-- CAMPO DE OBSERVAÇÃO -->
+
+        <div style="margin-bottom: 15px;">
+
+            <label style="display:block; margin-bottom: 8px; font-weight: bold; color: #d4af37;">Observação:</label>
+
+            <input type="text" id="observacao-venda" placeholder="Ex: Cortesia, faturado para empresa, etc.">
+
+        </div>
+
+
+
+        <!-- VISUALIZAÇÃO DO CÁLCULO DA MULTIPLICAÇÃO -->
+
+        <div style="background: #222; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px dashed #d4af37; text-align: center;">
+
+            <span style="color: #aaa; font-size: 0.9rem;">Total Multiplicado:</span>
+
+            <strong id="total-calculado" style="color: #28a745; font-size: 1.2rem; margin-left: 5px;">R$ 0,00</strong>
+
+        </div>
+
+
+
+        <button id="btn-gerar-ingresso" style="margin-top: 10px;">
+
+            🎟️ CONCLUIR E EMITIR INGRESSOS
+
+        </button>
+
+    </div>
+
+
+
+    <hr style="border: 0; border-top: 1px solid #333; margin: 40px 0 20px 0;">
+
+    <h3 style="color: #d4af37; letter-spacing: 1px;">📊 PAINEL DE INGRESSOS VENDIDOS</h3>
+
+    
+
+    <div id="lista-vendas">
+
+        <p style="color: #aaa;">Carregando histórico de vendas...</p>
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+    // Configuração do Firebase
+
+    const firebaseConfig = {
+  apiKey: "AIzaSyBZhLxRS-EV97Tm3ct_y1UnOaJ8y8RcXgI",
+  authDomain: "rock2-7ff1b.firebaseapp.com",
+  databaseURL: "https://rock2-7ff1b-default-rtdb.firebaseio.com",
+  projectId: "rock2-7ff1b",
+  storageBucket: "rock2-7ff1b.firebasestorage.app",
+  messagingSenderId: "434104566373",
+  appId: "1:434104566373:web:72441179d3b636a1817c8c"
+};
+
+
+
+    firebase.initializeApp(firebaseConfig);
+
+    const db = firebase.database();
+
+    const refReservas = db.ref("reservas_vip");
+
+
+
+    // MAPEAMENTO DOS ELEMENTOS
+
+    const btnGerar = document.getElementById("btn-gerar-ingresso");
+
+    const nomeInput = document.getElementById("nome-cliente");
+
+    const qtdInput = document.getElementById("qtd-ingressos");
+
+    const valorUnitInput = document.getElementById("valor-unitario");
+
+    const formaPagamentoSelect = document.getElementById("forma-pagamento");
+
+    const obsInput = document.getElementById("observacao-venda");
+
+    const totalCalculadoSpan = document.getElementById("total-calculado");
+
+    const listaVendasDiv = document.getElementById("lista-vendas");
+
+
+
+    // MULTIPLICA O VALOR NA TELA ENQUANTO DIGITA
+
+    function atualizarTotalCalculado() {
+
+        const qtd = parseInt(qtdInput.value) || 0;
+
+        const valorUnit = parseFloat(valorUnitInput.value) || 0;
+
+        const total = qtd * valorUnit;
+
+        totalCalculadoSpan.innerText = total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+    }
+
+
+
+    qtdInput.addEventListener("input", atualizarTotalCalculado);
+
+    valorUnitInput.addEventListener("input", atualizarTotalCalculado);
+
+
+
+    // FUNÇÃO QUE BUSCA OS DADOS NO INDEX.HTML
+
+    async function puxarDadosDoIndex() {
+
+        try {
+
+            const resposta = await fetch('./index.html');
+
+            if (!resposta.ok) throw new Error();
+
+            
+
+            const htmlTexto = await resposta.text();
+
+            const parser = new DOMParser();
+
+            const docIndex = parser.parseFromString(htmlTexto, 'text/html');
+
+            
+
+            const nomeNoIndex = docIndex.getElementById('evento-nome');
+
+            const dataNoIndex = docIndex.getElementById('evento-data');
+
+            
+
+            if (nomeNoIndex) document.getElementById('evento-nome').innerText = nomeNoIndex.innerText.trim().toUpperCase();
+
+            if (dataNoIndex) document.getElementById('evento-data').innerText = dataNoIndex.innerText.trim().toUpperCase();
+
+            
+
+        } catch (error) {
+
+            document.getElementById('evento-nome').innerText = "BANDA FÊNIX";
+
+            document.getElementById('evento-data').innerText = "06/06/2026 - 21H";
+
+        }
+
+    }
+
+
+
+    puxarDadosDoIndex();
+
+
+
+    function gerarCodigoAvulso() {
+
+        const aleatorio = Math.random().toString(36).substring(2, 8).toUpperCase();
+
+        return `LB-AVULSO-${aleatorio}`;
+
+    }
+
+
+
+    // SALVAR NO BANCO DE DADOS
+
+    btnGerar.addEventListener("click", async () => {
+
+        const nome = nomeInput.value.trim();
+
+        const qtd = parseInt(qtdInput.value);
+
+        const valorUnit = parseFloat(valorUnitInput.value);
+
+        const formaPagamento = formaPagamentoSelect.value;
+
+        const obs = obsInput.value.trim();
+
+
+
+        if (!nome) { alert("Digite o nome do cliente."); return; }
+
+        if (isNaN(qtd) || qtd < 1) { alert("Quantidade inválida."); return; }
+
+        if (isNaN(valorUnit) || valorUnit < 0) { alert("Informe o valor por convite."); return; }
+
+
+
+        // FAZ A MULTIPLICAÇÃO PARA ENVIAR O TOTAL CORRETO PRO FIREBASE
+
+        const valorTotalPago = qtd * valorUnit;
+
+
+
+        try {
+
+            btnGerar.disabled = true;
+
+            btnGerar.innerText = "Processando...";
+
+
+
+            const convidadosObjeto = {};
+
+            for (let i = 1; i <= qtd; i++) {
+
+                convidadosObjeto[i] = {
+
+                    codigo: gerarCodigoAvulso(),
+
+                    usado: false,
+
+                    entradaEm: ""
+
+                };
+
+            }
+
+
+
+            await refReservas.push().set({
+
+                mesa: "Individual", 
+
+                responsavel: nome,
+
+                qtd: qtd,
+
+                valorPago: valorTotalPago, // Salva o total multiplicado
+
+                formaPagamento: formaPagamento,
+
+                observacao: obs,
+
+                convidados: convidadosObjeto
+
+            });
+
+
+
+            alert("Ingressos lançados com sucesso!");
+
+            nomeInput.value = "";
+
+            qtdInput.value = "1";
+
+            valorUnitInput.value = "";
+
+            obsInput.value = "";
+
+            atualizarTotalCalculado();
+
+
+
+        } catch (error) {
+
+            alert("Erro ao lançar: " + error.message);
+
+        } finally {
+
+            btnGerar.disabled = false;
+
+            btnGerar.innerText = "🎟️ CONCLUIR E EMITIR INGRESSOS";
+
+        }
+
+    });
+
+
+
+    // RENDERIZAR O PAINEL DE VENDAS NA TELA
+
+    refReservas.on("value", (snapshot) => {
+
+        const reservas = snapshot.val();
+
+        let html = "";
+
+
+
+        if (!reservas) {
+
+            listaVendasDiv.innerHTML = `<p style="color: #666;">Nenhuma venda realizada ainda.</p>`;
+
+            return;
+
+        }
+
+
+
+        const listaInvertida = Object.entries(reservas).reverse();
+
+
+
+        for (const [reservaId, data] of listaInvertida) {
+
+            if (data.mesa !== "Individual") continue;
+
+
+
+            const valorFormatado = data.valorPago ? parseFloat(data.valorPago).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : "R$ 0,00";
+
+            const formaFormatada = data.formaPagamento ? ` | Ref: <strong>${data.formaPagamento}</strong>` : "";
+
+            const obsFormatada = data.observacao ? `<br><span style="font-size: 0.85rem; color: #d4af37; font-style: italic;">📝 Obs: ${data.observacao}</span>` : "";
+
+
+
+            html += `
+
+                <div style="border: 1px solid #333; padding: 20px; margin-bottom: 20px; border-radius: 12px; background: #111; text-align: left;">
+
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #222; padding-bottom: 10px; margin-bottom: 10px;">
+
+                        <div>
+
+                            <strong style="font-size: 1.15rem; color: white;">👤 ${data.responsavel.toUpperCase()}</strong><br>
+
+                            <span style="font-size: 0.9rem; color: #aaa;">Qtd: <strong>${data.qtd}</strong> | Total Pago: <strong style="color: #28a745;">${valorFormatado}</strong>${formaFormatada}</span>
+
+                            ${obsFormatada}
+
+                        </div>
+
+                        <button onclick="cancelarVenda('${reservaId}', '${data.responsavel}')" style="width: auto; background: #dc3545; color: white; padding: 6px 12px; font-size: 13px; border-radius: 6px;">
+
+                            ❌ Cancelar
+
+                        </button>
+
+                    </div>
+
+            `;
+
+
+
+            if (data.convidados) {
+
+                Object.entries(data.convidados).forEach(([key, convidado]) => {
+
+                    const statusText = convidado.usado ? `<span style="color:#28a745; font-weight:bold;">✅ Entrou</span>` : `<span style="color:#aaa;">⛔ Disponível</span>`;
+
+                    
+
+                    html += `
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: #070707; padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #222;">
+
+                            <div style="font-size: 0.9rem;">
+
+                                <small style="color: #666;">Ingresso ${key}/${data.qtd}</small><br>
+
+                                <strong style="font-family: monospace; font-size: 1rem; color: #d4af37;">${convidado.codigo}</strong>
+
+                                <br>${statusText}
+
+                            </div>
+
+                            <button onclick="gerarPdfIngresso('${data.responsavel}', '${convidado.codigo}', ${key}, ${data.qtd})" style="width: auto; background: #d4af37; color: black; padding: 6px 12px; font-size: 13px; border-radius: 6px;">
+
+                                📄 PDF
+
+                            </button>
+
+                        </div>
+
+                    `;
+
+                });
+
+            }
+
+
+
+            html += `</div>`;
+
+        }
+
+
+
+        listaVendasDiv.innerHTML = html || `<p style="color: #666;">Nenhum ingresso avulso encontrado.</p>`;
+
+    });
+
+
+
+    async function cancelarVenda(id, nome) {
+
+    const senha = prompt(`Digite a senha para CANCELAR a venda de "${nome}":`);
+
+    if (senha !== SENHA_EXCLUSAO) {
+        alert("Senha incorreta! Cancelamento bloqueado.");
+        return;
+    }
+
+    const confirmar = confirm(`Tem certeza que deseja CANCELAR todos os ingressos de "${nome}"?`);
+
+    if (confirmar) {
+        try {
+            await refReservas.child(id).remove();
+            alert("Venda cancelada!");
+        } catch (error) {
+            alert("Erro ao cancelar: " + error.message);
+        }
+    }
+}
+
+
+
+    // GERADOR DO PDF
+
+    async function gerarPdfIngresso(nome, codigo, atual, total) {
+
+        const { jsPDF } = window.jspdf;
+
+        
+
+        const doc = new jsPDF({
+
+            orientation: "portrait",
+
+            unit: "mm",
+
+            format: "a4"
+
+        });
+
+
+
+        const nomeEvento = document.getElementById("evento-nome").innerText;
+
+        const dataEvento = document.getElementById("evento-data").innerText;
+
+
+
+        const linkValidacao = window.location.href.replace("ingresso_avulso.html", "validacao.html") + "?cod=" + codigo;
+
+        
+
+        try {
+
+            const qrDataUrl = await QRCode.toDataURL(linkValidacao, { margin: 1, width: 500 });
+
+
+
+            const largura = 90;
+
+            const altura = 140;
+
+            const x = (210 - largura) / 2;
+
+            const y = 35;
+
+
+
+            doc.setFillColor(8, 8, 8);
+
+            doc.roundedRect(x, y, largura, altura, 5, 5, 'F');
+
+
+
+            doc.setDrawColor(212, 175, 55);
+
+            doc.setLineWidth(0.8);
+
+            doc.roundedRect(x + 2, y + 2, largura - 4, altura - 4, 4, 4);
+
+
+
+            doc.setTextColor(212, 175, 55);
+
+            doc.setFont("helvetica", "bold");
+
+            doc.setFontSize(20);
+
+            doc.text("LE BEEF", 105, y + 16, { align: "center" });
+
+
+
+            doc.setFontSize(10);
+
+            doc.text("INGRESSO", 105, y + 23, { align: "center" });
+
+
+
+            doc.setDrawColor(212, 175, 55);
+
+            doc.line(x + 10, y + 27, x + largura - 10, y + 27);
+
+
+
+            doc.setFontSize(14);
+
+            doc.text(nomeEvento, 105, y + 37, { align: "center" });
+
+
+
+            doc.setFontSize(10);
+
+            doc.text(dataEvento, 105, y + 44, { align: "center" });
+
+
+
+            doc.setFont("helvetica", "bold");
+
+            doc.setFontSize(11);
+
+            doc.text("INGRESSO INDIVIDUAL", 105, y + 53, { align: "center" });
+
+
+
+            doc.setTextColor(255, 255, 255);
+
+            doc.setFont("helvetica", "normal");
+
+            doc.setFontSize(10);
+
+            doc.text(nome.toUpperCase(), 105, y + 63, { align: "center" });
+
+
+
+            doc.setTextColor(212, 175, 55);
+
+            doc.setFont("helvetica", "bold");
+
+            doc.setFontSize(13);
+
+            doc.text(`INGRESSO ${atual} DE ${total}`, 105, y + 73, { align: "center" });
+
+
+
+            doc.addImage(qrDataUrl, "PNG", x + 20, y + 80, 50, 50);
+
+
+
+            doc.setTextColor(212, 175, 55);
+
+            doc.setFontSize(9);
+
+            doc.text(codigo, 105, y + 135, { align: "center" });
+
+
+
+            doc.setTextColor(160, 160, 160);
+
+            doc.setFontSize(8);
+
+            doc.setFont("helvetica", "normal");
+
+            doc.text("Apresente este QR na entrada", 105, y + 143, { align: "center" });
+
+
+
+            doc.save(`LEBEEF_AVULSO_${codigo}.pdf`);
+
+
+
+        } catch (err) {
+
+            alert("Erro ao montar o PDF: " + err.message);
+
+        }
+
+    }
+
+
+    // ESSA PORRA DE EXCEL
+
+
+document.getElementById("btn-exportar-excel").addEventListener("click", async () => {
+
+    const snapshot = await refReservas.once("value");
+    const reservas = snapshot.val();
+
+    if (!reservas) {
+        alert("Nenhuma venda encontrada.");
+        return;
+    }
+
+    const dados = [];
+
+    Object.entries(reservas).forEach(([id, venda]) => {
+
+        if (venda.mesa !== "Individual") return;
+
+        if (venda.convidados) {
+            Object.entries(venda.convidados).forEach(([num, c]) => {
+                dados.push({
+    Cliente: venda.responsavel,
+    QT: 1,
+    Valor: (venda.valorPago / venda.qtd),
+    "Pg.": venda.formaPagamento,
+    "Obs.": venda.observacao || "",
+    Ingresso: num,
+    Codigo: c.codigo,
+                });
+            });
+        }
+
+    });
+
+    const ws = XLSX.utils.json_to_sheet(dados);
+    const wb = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(wb, ws, "Ingressos");
+
+    XLSX.writeFile(wb, "ingressos_lebeef.xlsx");
+});
+
+// SENHA EXCLUSAO
+
+const SENHA_EXCLUSAO = "120805";
+
+// SENHA DE ACESSO AO SITE
+
+function verificarSenha() {
+    const senha = document.getElementById("senha").value;
+
+    if (senha === "1212") { // 🔑 SUA SENHA AQUI
+        document.getElementById("login-box").style.display = "none";
+    } else {
+        document.getElementById("erro").innerText = "Senha incorreta!";
+    }
+}
+
+</script>
+
+
+
+</body>
+
+</html> 
+

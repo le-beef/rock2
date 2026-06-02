@@ -1,0 +1,91 @@
+body{
+    margin:0;
+    background:#050505;
+    color:white;
+    font-family:Arial,sans-serif;
+}
+
+.container{
+    max-width:500px;
+    margin:auto;
+    text-align:center;
+    padding:40px 20px;
+}
+
+h1{
+    color:#d4af37;
+    font-size:40px;
+}
+
+h2{
+    margin-bottom:30px;
+}
+
+input{
+    width:100%;
+    box-sizing:border-box;
+    padding:18px;
+    font-size:20px;
+    border-radius:12px;
+    border:none;
+    margin-bottom:20px;
+}
+
+button{
+    width:100%;
+    border:none;
+    background:#d4af37;
+    color:black;
+    font-size:22px;
+    font-weight:bold;
+    padding:18px;
+    border-radius:12px;
+    cursor:pointer;
+}
+
+#resultado{
+    margin-top:30px;
+}
+.card{
+
+    background:#111;
+    border:2px solid #d4af37;
+    border-radius:15px;
+    padding:25px;
+}
+
+.ok{
+    color:#00ff88;
+}
+
+.erro{
+    color:#ff4d4d;
+}
+
+.acoes-busca{
+    display:flex;
+    gap:10px;
+    width:100%;
+    margin-top:10px;
+}
+
+#btn-pesquisar,
+#btn-listar{
+    width:50%;
+    padding:14px;
+    border:none;
+    border-radius:10px;
+    font-size:15px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+#btn-pesquisar{
+    background:#8B0000;
+    color:#fff;
+}
+
+#btn-listar{
+    background:#111;
+    color:#fff;
+}
